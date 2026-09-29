@@ -68,6 +68,8 @@ class TransmissionMonitor:
     
     with self._lock:
       start_us = int(self._in_flight.pop(flight_id) * 1e6)
+      # time.monotonic() ticks every ~15.6 ms on Windows before Python 3.13
+      # and IntervalTree rejects zero-length intervals.
       end_us = max(end_us, start_us + 1)
       self._in_flight_bytes -= num_bytes
       self._intervaltree.addi(start_us, end_us, [flight_id, num_bytes])
